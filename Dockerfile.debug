@@ -1,17 +1,30 @@
-# Use a slim Python image to keep the size down
-FROM python:3.8-slim
+# 使用多阶段构建减小镜像大小
+# 第一阶段：构建环境
+FROM python:3.9-slim AS builder
 
-# Set the working directory
+# 设置工作目录
 WORKDIR /app
 
-# Install git
-RUN apt-get update && apt-get install -y git \
-    && rm -rf /var/lib/apt/lists/*
+# 安装git并清理缓存（合并RUN命令减少层数）
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git && \
+    rm -rf /var/lib/apt/lists/*
 
-# Clone the repository and install dependencies
-RUN git clone https://github.com/VainF/Torch-Pruning.git . \
-    && pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
-    && apt-get purge -y --auto-remove git
+# 复制本地项目文件而不是克隆（假设在本地构建）
+COPY . .
 
-# Set up the entry point
+# 安装依赖（使用setup.py中的依赖）
+RUN pip install --no-cache-dir -e . -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 第二阶段：运行环境
+FROM python:3.9-slim
+WORKDIR /app
+
+# 只安装运行时必要的包
+RUN pip install --no-cache-dir torch numpy -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 从构建阶段复制安装好的包和代码
+COPY --from=builder /app /app
+
+# 设置入口点
 CMD ["/bin/bash"]
