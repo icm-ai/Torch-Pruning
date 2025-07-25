@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 设置默认值
-IMAGE_NAME="torch-pruning-debug"
+IMAGE_NAME="torch-pruning:debug"
 DOCKERFILE="Dockerfile.debug"
 
 # 处理命令行参数
