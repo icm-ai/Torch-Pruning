@@ -2,6 +2,9 @@
 # 第一阶段：构建环境
 FROM python:3.9-slim AS builder
 
+ARG http_proxy
+ARG https_proxy
+
 # 设置工作目录
 WORKDIR /app
 
