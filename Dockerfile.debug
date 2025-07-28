@@ -29,5 +29,5 @@ RUN pip install --no-cache-dir torch numpy -i https://pypi.tuna.tsinghua.edu.cn/
 # 从构建阶段复制安装好的包和代码
 COPY --from=builder /app /app
 
-# 设置入口点
-CMD ["/bin/bash"]
+# 保持容器运行  
+CMD ["tail", "-f", "/dev/null"]
